@@ -19,6 +19,9 @@ class Propietario(models.Model):
         return self.inmuebles.count()  # ← gracias a related_name en Inmueble
     num_inmuebles.short_description = "Nº inmuebles"
 
+    class Meta:
+        ordering = ["nombre"]
+
 
 class Inmueble(models.Model):
     TIPO_CHOICES =[
@@ -38,6 +41,9 @@ class Inmueble(models.Model):
     def __str__(self):
         return f"{self.get_tipo_display()} · {self.direccion}{self.planta or ''}{self.puerta or ''}".strip()
 
+    class Meta:
+        ordering = ["direccion"]
+
 class Inquilino(models.Model):
     nombre = models.CharField(max_length=100)
     dni = models.CharField(max_length=20, blank=False, unique=True)
@@ -47,6 +53,9 @@ class Inquilino(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.dni})"
+
+    class Meta:
+        ordering = ["nombre"]
 
 class Contrato(models.Model):
     inmueble = models.ForeignKey(Inmueble, on_delete=models.CASCADE, related_name="contratos")
@@ -60,8 +69,10 @@ class Contrato(models.Model):
     def __str__(self):
         fin = self.fecha_fin.strftime("%Y-%m-%d") if self.fecha_fin else "abierto"
         return f"{self.inmueble} · {self.fecha_inicio:%Y-%m-%d}→{fin}"
-    
-   
+
+    class Meta:
+        ordering = ["-fecha_inicio", "inmueble_id"]
+
 
 class Incidencia (models.Model):
     inmueble = models.ForeignKey(Inmueble, on_delete=models.CASCADE, related_name='incidencias')
@@ -73,6 +84,9 @@ class Incidencia (models.Model):
     def __str__(self):
         return f"{self.inmueble} · {self.estado} · {self.fecha_reporte:%Y-%m-%d}"
 
+    class Meta:
+        ordering = ["-fecha_reporte"]
+
 class Documento(models.Model):
     inmueble = models.ForeignKey(Inmueble, on_delete=models.CASCADE, related_name='documentos')
     descripcion = models.CharField(max_length=200, blank=True)
@@ -81,6 +95,9 @@ class Documento(models.Model):
 
     def __str__(self):
         return self.descripcion or self.archivo.name
+
+    class Meta:
+        ordering = ["-fecha_subida"]
 
 class TipoPago(models.Model):
     QUIEN_CHOICES = [
@@ -104,6 +121,9 @@ class TipoPago(models.Model):
     #fin auditoria
     def __str__(self):
         return self.nombre
+
+    class Meta:
+        ordering = ["nombre"]
 
 class Pago(models.Model):
     inmueble = models.ForeignKey(Inmueble, on_delete=models.CASCADE, related_name='pagos')

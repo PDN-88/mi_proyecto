@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inmobiliaria · Panel</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; margin: 2rem; }
+    header { margin-bottom: 2rem; }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; background: #fff; }
+    h1 { font-size: 1.5rem; margin: 0 0 .5rem; }
+    h2 { font-size: 1rem; margin: 0 0 .5rem; color: #374151; }
+    ul { margin: 0; padding-left: 1.2rem; }
+    .muted { color: #6b7280; font-size: .9rem; }
+    .kpi { font-size: 2rem; font-weight: 600; }
+    footer { margin-top: 2rem; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Panel inmobiliario</h1>
+    <p class="muted">Hoy: {{ hoy }}</p>
+  </header>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Propietarios</h2>
+      <div class="kpi">{{ stats.propietarios }}</div>
+    </div>
+    <div class="card">
+      <h2>Inmuebles</h2>
+      <div class="kpi">{{ stats.inmuebles }}</div>
+    </div>
+    <div class="card">
+      <h2>Inquilinos</h2>
+      <div class="kpi">{{ stats.inquilinos }}</div>
+    </div>
+    <div class="card">
+      <h2>Contratos</h2>
+      <div class="kpi">{{ stats.contratos }}</div>
+    </div>
+    <div class="card">
+      <h2>Pagos pendientes</h2>
+      <div class="kpi">{{ stats.pagos_pendientes }}</div>
+    </div>
+  </section>
+
+  <section class="grid" style="margin-top: 1.5rem;">
+    <div class="card">
+      <h2>Pagos recientes</h2>
+      <ul>
+        {% for pago in pagos_recientes %}
+          <li>{{ pago.fecha }} · {{ pago.tipo }} · {{ pago.total }} € · {{ pago.inmueble }}</li>
+        {% empty %}
+          <li class="muted">Sin datos</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Incidencias recientes</h2>
+      <ul>
+        {% for inc in incidencias_recientes %}
+          <li>{{ inc.fecha_reporte }} · {{ inc.estado }} · {{ inc.inmueble }}</li>
+        {% empty %}
+          <li class="muted">Sin datos</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p class="muted">Accede al <a href="/admin/">administrador</a> para gestionar datos.</p>
+  </footer>
+</body>
+</html>
