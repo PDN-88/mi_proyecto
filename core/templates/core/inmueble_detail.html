@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ object }} · Inmogestor{% endblock %}
+{% block content %}
+<h1>{{ object }}</h1>
+<ul>
+  <li>Tipo: {{ object.get_tipo_display }}</li>
+  <li>Dirección: {{ object.direccion }}</li>
+  <li>Metros: {{ object.metros }}</li>
+  <li>Habitaciones: {{ object.habitaciones|default:"-" }}</li>
+  <li>Propietario: {{ object.propietario }}</li>
+</ul>
+<p>
+  <a href="{% url 'core:inmueble_update' object.pk %}">Editar</a> ·
+  <a href="{% url 'core:inmueble_delete' object.pk %}">Borrar</a> ·
+  <a href="{% url 'core:inmueble_list' %}">Volver</a>
+</p>
+{% endblock %}

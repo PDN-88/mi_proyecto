@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Propietarios · Inmogestor{% endblock %}
+{% block content %}
+<h1>Propietarios</h1>
+<ul>
+  {% for p in object_list %}
+    <li>{{ p.nombre }} ({{ p.dni }}) — {{ p.num_inmuebles }} inmuebles</li>
+  {% empty %}
+    <li>No hay propietarios.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>{% block title %}Inmogestor{% endblock %}</title>
+  {% load static %}
+</head>
+<body>
+  <nav>
+    <a href="{% url 'core:home' %}">Inicio</a> ·
+    <a href="{% url 'core:inmueble_list' %}">Inmuebles</a> ·
+    <a href="{% url 'core:propietario_list' %}">Propietarios</a> ·
+    <a href="/admin/">Admin</a>
+  </nav>
+  <hr/>
+  {% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Inmuebles · Inmogestor{% endblock %}
+{% block content %}
+<h1>Inmuebles</h1>
+
+<p><a href="{% url 'core:inmueble_create' %}">+ Crear inmueble</a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tipo</th><th>Dirección</th><th>Metros</th><th>Propietario</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for obj in object_list %}
+    <tr>
+      <td>{{ obj.get_tipo_display }}</td>
+      <td><a href="{% url 'core:inmueble_detail' obj.pk %}">{{ obj.direccion }}</a></td>
+      <td>{{ obj.metros }}</td>
+      <td>{{ obj.propietario }}</td>
+      <td>
+        <a href="{% url 'core:inmueble_update' obj.pk %}">Editar</a> ·
+        <a href="{% url 'core:inmueble_delete' obj.pk %}">Borrar</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">No hay inmuebles.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+  <div>
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">« Anterior</a>{% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Siguiente »</a>{% endif %}
+  </div>
+{% endif %}
+{% endblock %}
