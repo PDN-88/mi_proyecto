@@ -1,65 +1,126 @@
 {% extends "base.html" %}
-{% block title %}Panel de administración{% endblock %}
 
 {% block content %}
-<h1>Panel del equipo</h1>
-<p>Resumen general de la plataforma. Usa el admin para editar cualquier dato.</p>
+<div class="container mt-4">
+    <h1 class="mb-4">Panel de Administración</h1>
 
-<section>
-  <div class="grid">
-    <div class="card"><div class="muted">Propietarios</div><div class="stat">{{ counts.propietarios }}</div></div>
-    <div class="card"><div class="muted">Inquilinos</div><div class="stat">{{ counts.inquilinos }}</div></div>
-    <div class="card"><div class="muted">Inmuebles</div><div class="stat">{{ counts.inmuebles }}</div></div>
-    <div class="card"><div class="muted">Contratos</div><div class="stat">{{ counts.contratos }}</div></div>
-    <div class="card"><div class="muted">Pagos</div><div class="stat">{{ counts.pagos }}</div></div>
-    <div class="card"><div class="muted">Incidencias</div><div class="stat">{{ counts.incidencias }}</div></div>
-  </div>
-</section>
+    <!-- Global Stats -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Propietarios</h5>
+                    <p class="card-text display-4">{{ counts.propietarios }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Inquilinos</h5>
+                    <p class="card-text display-4">{{ counts.inquilinos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Inmuebles</h5>
+                    <p class="card-text display-4">{{ counts.inmuebles }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Contratos</h5>
+                    <p class="card-text display-4">{{ counts.contratos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Pagos</h5>
+                    <p class="card-text display-4">{{ counts.pagos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Incidencias</h5>
+                    <p class="card-text display-4">{{ counts.incidencias }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<section>
-  <div class="grid">
-    <div class="card">
-      <h2 style="margin-top:0;">Inmuebles recientes</h2>
-      <ul class="list">
-        {% for i in recent.inmuebles %}
-          <li><strong>{{ i }}</strong><div class="muted">{{ i.propietario }}</div></li>
-        {% empty %}
-          <li class="muted">—</li>
-        {% endfor %}
-      </ul>
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Últimos Inmuebles Añadidos</h3>
+                    <a href="{% url 'admin:core_inmueble_changelist' %}" class="btn btn-sm btn-outline-secondary">Ver Todos</a>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for inmueble in recent.inmuebles %}
+                            <li class="list-group-item">
+                                {{ inmueble }}<br>
+                                <small class="text-muted">Propietario: {{ inmueble.propietario.nombre }}</small>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">No hay inmuebles recientes.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Pagos Recientes</h3>
+                    <a href="{% url 'admin:core_pago_changelist' %}" class="btn btn-sm btn-outline-secondary">Ver Todos</a>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for pago in recent.pagos %}
+                            <li class="list-group-item">
+                                {{ pago.inmueble }} - {{ pago.tipo.nombre }} - {{ pago.total }}€
+                                <span class="badge {% if pago.pagado %}bg-success{% else %}bg-warning{% endif %} float-end">{{ pago.get_quien_paga_display }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">No hay pagos recientes.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card">
-      <h2 style="margin-top:0;">Pagos recientes</h2>
-      <ul class="list">
-        {% for p in recent.pagos %}
-          <li>
-            <strong>{{ p.fecha|date:"Y-m-d" }}</strong> · {{ p.tipo }} · {{ p.total }} €
-            <div class="muted">{{ p.inmueble }}</div>
-          </li>
-        {% empty %}
-          <li class="muted">—</li>
-        {% endfor %}
-      </ul>
-    </div>
-    <div class="card">
-      <h2 style="margin-top:0;">Incidencias recientes</h2>
-      <ul class="list">
-        {% for inc in recent.incidencias %}
-          <li>
-            <strong>{{ inc.inmueble }}</strong>
-            <div class="muted">{{ inc.fecha_reporte|date:"Y-m-d" }} · {{ inc.estado }}</div>
-          </li>
-        {% empty %}
-          <li class="muted">—</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
-</section>
 
-<p>
-  <a class="btn" href="/admin/">Ir al admin</a>
-  · <a class="btn" href="{% url 'core:inmueble_list' %}">Gestionar inmuebles</a>
-  · <a class="btn" href="{% url 'core:propietario_list' %}">Propietarios</a>
-</p>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Incidencias Pendientes</h3>
+                    <a href="{% url 'admin:core_incidencia_changelist' %}" class="btn btn-sm btn-outline-secondary">Ver Todas</a>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for incidencia in recent.incidencias %}
+                            <li class="list-group-item">
+                                {{ incidencia.inmueble }}: {{ incidencia.descripcion|truncatewords:20 }}
+                                <span class="badge bg-danger float-end">{{ incidencia.estado }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">No hay incidencias recientes.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
