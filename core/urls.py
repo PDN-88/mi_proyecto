@@ -21,4 +21,7 @@ urlpatterns = [
 
     # Propietarios (solo lista para empezar)
     path("propietarios/", views.PropietarioList.as_view(), name="propietario_list"),
+
+    # Incidencias
+    path("incidencias/crear/", views.IncidenciaCreate.as_view(), name="incidencia_create"),
 ]

@@ -1,93 +1,106 @@
 {% extends "base.html" %}
-{% block title %}Panel de propietario{% endblock %}
 
 {% block content %}
-<h1>Panel de propietario</h1>
-<p>Bienvenido. Aquí puedes revisar el estado de tus inmuebles, pagos e incidencias.</p>
+<div class="container mt-4">
+    <h1 class="mb-4">Panel del Propietario</h1>
 
-<section>
-  <div class="grid">
-    <div class="card">
-      <div class="muted">Inmuebles</div>
-      <div class="stat">{{ stats.inmuebles }}</div>
-    </div>
-    <div class="card">
-      <div class="muted">Contratos</div>
-      <div class="stat">{{ stats.contratos }}</div>
-    </div>
-    <div class="card">
-      <div class="muted">Pagos pendientes</div>
-      <div class="stat">{{ stats.pagos_pendientes }}</div>
-    </div>
-    <div class="card">
-      <div class="muted">Incidencias abiertas</div>
-      <div class="stat">{{ stats.incidencias_abiertas }}</div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>Mis inmuebles</h2>
-  <div class="grid">
-    {% for i in inmuebles %}
-      <div class="card">
-        <h3 style="margin:0 0 .25rem 0;">{{ i }}</h3>
-        <div class="muted">{{ i.metros }} m²{% if i.habitaciones %} · {{ i.habitaciones }} hab.{% endif %}</div>
-        <div style="margin-top:.5rem;">
-          <a class="btn" href="{% url 'core:inmueble_detail' i.pk %}">Ver</a>
-          <a class="btn" href="{% url 'core:inmueble_update' i.pk %}">Editar</a>
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Inmuebles</h5>
+                    <p class="card-text display-4">{{ stats.inmuebles }}</p>
+                </div>
+            </div>
         </div>
-      </div>
-    {% empty %}
-      <p>No tienes inmuebles asociados actualmente.</p>
-    {% endfor %}
-  </div>
-</section>
-
-<section>
-  <div class="grid">
-    <div class="card">
-      <h2 style="margin-top:0;">Pagos recientes</h2>
-      <ul class="list">
-        {% for p in pagos %}
-          <li>
-            <strong>{{ p.fecha|date:"Y-m-d" }}</strong> · {{ p.tipo }} · {{ p.total }} € ·
-            <span class="badge {% if p.pagado %}ok{% else %}warn{% endif %}">{% if p.pagado %}Pagado{% else %}Pendiente{% endif %}</span>
-            <div class="muted">{{ p.inmueble }}</div>
-          </li>
-        {% empty %}
-          <li class="muted">No hay pagos registrados.</li>
-        {% endfor %}
-      </ul>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Contratos Activos</h5>
+                    <p class="card-text display-4">{{ stats.contratos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Pagos Pendientes</h5>
+                    <p class="card-text display-4">{{ stats.pagos_pendientes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Incidencias Abiertas</h5>
+                    <p class="card-text display-4">{{ stats.incidencias_abiertas }}</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card">
-      <h2 style="margin-top:0;">Incidencias recientes</h2>
-      <ul class="list">
-        {% for inc in incidencias %}
-          <li>
-            <strong>{{ inc.inmueble }}</strong>
-            <div class="muted">{{ inc.fecha_reporte|date:"Y-m-d" }} · {{ inc.estado }}</div>
-            <div>{{ inc.descripcion|truncatechars:120 }}</div>
-          </li>
-        {% empty %}
-          <li class="muted">No hay incidencias.</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
-</section>
 
-<section>
-  <h2>Contratos</h2>
-  <ul class="list">
-    {% for c in contratos %}
-      <li>
-        <strong>{{ c.inmueble }}</strong> · {{ c.fecha_inicio|date:"Y-m-d" }} → {% if c.fecha_fin %}{{ c.fecha_fin|date:"Y-m-d" }}{% else %}abierto{% endif %}
-        <div class="muted">Inquilinos: {% for i in c.inquilinos.all %}{{ i.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
-      </li>
-    {% empty %}
-      <li class="muted">No hay contratos registrados.</li>
-    {% endfor %}
-  </ul>
-</section>
+    <!-- Inmuebles -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Mis Inmuebles</h3>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for inmueble in inmuebles %}
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <strong>{{ inmueble }}</strong> - {{ inmueble.contratos.count }} contrato(s)
+                    </a>
+                {% empty %}
+                    <p class="list-group-item">No tienes inmuebles registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimos Pagos -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Últimos Pagos Recibidos</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for pago in pagos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ pago.inmueble }}</strong> - {{ pago.tipo.nombre }}
+                            <small class="d-block text-muted">{{ pago.fecha|date:"d/m/Y" }}</small>
+                        </div>
+                        <span class="badge {% if pago.pagado %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
+                            {{ pago.total }}€ - {% if pago.pagado %}Pagado{% else %}Pendiente{% endif %}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No hay pagos registrados.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Incidencias Recientes -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Incidencias Recientes</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for incidencia in incidencias %}
+                    <li class="list-group-item">
+                        <strong>{{ incidencia.inmueble }}</strong>: {{ incidencia.descripcion|truncatewords:15 }}
+                        <span class="badge {% if incidencia.fecha_resolucion %}bg-secondary{% else %}bg-danger{% endif %} float-end">
+                            {{ incidencia.estado }}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No hay incidencias reportadas.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}

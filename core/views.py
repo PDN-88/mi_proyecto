@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Inmueble, Propietario, Inquilino, Contrato, Pago, Incidencia
-from .forms import InmuebleForm
+from .forms import InmuebleForm, IncidenciaForm
 
 @login_required
 def home(request):
@@ -168,3 +168,19 @@ class PropietarioList(LoginRequiredMixin, ListView):
     model = Propietario
     ordering = ["nombre"]
     template_name = "core/propietario_list.html"
+
+# --- Incidencias ---
+class IncidenciaCreate(LoginRequiredMixin, CreateView):
+    model = Incidencia
+    form_class = IncidenciaForm
+    template_name = "core/incidencia_form.html"
+    success_url = reverse_lazy("core:inquilino_panel")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        # The user is already passed to the form in get_form_kwargs
+        return super().form_valid(form)
