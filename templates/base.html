@@ -6,65 +6,85 @@
   {% load static %}
   {% block extra_head %}{% endblock %}
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 16px; }
-    nav a { text-decoration: none; margin-right: .6rem; }
-    nav a:hover { text-decoration: underline; }
+    :root { --primary: #2563eb; --bg:#0b1020; --muted:#6b7280; --card:#ffffff; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f6f8fb; color:#0f172a; }
+    header { background:#111827; color:white; padding:.75rem 1rem; }
+    header a { color:#c7d2fe; text-decoration:none; margin-right:.75rem; }
+    header a:hover { color:white; text-decoration:underline; }
     .right { float: right; }
-    .btn-link { background: none; border: none; color: #06c; cursor: pointer; padding: 0; font: inherit; }
+    main { max-width: 1100px; margin: 1.25rem auto 2rem; padding: 0 1rem; }
+    .btn-link { background: none; border: none; color: #c7d2fe; cursor: pointer; padding: 0; font: inherit; }
+
     .messages { margin: .75rem 0; padding: 0; list-style: none; }
-    .messages li { margin: .25rem 0; padding: .5rem .75rem; background: #f6f8fa; border: 1px solid #e5e7eb; border-radius: .375rem; }
+    .messages li { margin: .25rem 0; padding: .5rem .75rem; background: #eef2ff; border: 1px solid #e5e7eb; border-radius: .375rem; }
+
+    .grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 1rem; }
+    .card { background: var(--card); border:1px solid #e5e7eb; border-radius:.5rem; padding:1rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .muted { color: var(--muted); font-size:.9rem; }
+    .stat { font-size: 1.75rem; font-weight: 700; margin-top: .25rem; }
+    .badge { display:inline-block; padding:.1rem .5rem; border-radius:999px; font-size:.75rem; border:1px solid #e5e7eb; }
+    .badge.ok { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+    .badge.warn { background:#fff7ed; color:#b45309; border-color:#fed7aa; }
+    .list { list-style:none; padding-left:0; margin:0; }
+    .list li { padding:.5rem 0; border-bottom:1px solid #f1f5f9; }
+    .btn { display:inline-block; padding:.4rem .7rem; border:1px solid #e5e7eb; border-radius:.375rem; background:white; color:#111827; text-decoration:none; margin-right:.4rem; }
+    .btn:hover { background:#f9fafb; }
   </style>
 </head>
 <body>
   {% load roles %}
 
-  <nav>
-    <a href="{% url 'core:home' %}">Inicio</a>
-
-    {# Enlaces a paneles por grupo #}
-    {% if user|in_group:"Propietarios" %}
-      · <a href="{% url 'core:propietario_panel' %}">Mi panel de propietario</a>
-    {% endif %}
-    {% if user|in_group:"Inquilinos" %}
-      · <a href="{% url 'core:inquilino_panel' %}">Mi panel de inquilino</a>
-    {% endif %}
-
-    {# Enlaces visibles solo si tiene permiso de ver el modelo #}
-    {% if perms.core.view_inmueble %}
-      · <a href="{% url 'core:inmueble_list' %}">Inmuebles</a>
-    {% endif %}
-    {% if perms.core.view_propietario %}
-      · <a href="{% url 'core:propietario_list' %}">Propietarios</a>
-    {% endif %}
-
-    · <a href="/admin/">Admin</a>
-
-    <span class="right">
+  <header>
+    <nav>
+      <a href="{% url 'core:home' %}">Inicio</a>
       {% if user.is_authenticated %}
-        {{ user.username }}
-        <form method="post" action="{% url 'logout' %}" style="display:inline;">
-          {% csrf_token %}
-          <input type="hidden" name="next" value="{% url 'login' %}">
-          <button type="submit" class="btn-link">Salir</button>
-        </form>
-      {% else %}
-        <a href="{% url 'login' %}">Entrar</a>
+        · <a href="{% url 'core:dashboard' %}">Panel</a>
       {% endif %}
-    </span>
-  </nav>
 
-  <hr>
+      {% if user|in_group:"Propietarios" %}
+        · <a href="{% url 'core:propietario_panel' %}">Mi panel de propietario</a>
+      {% endif %}
+      {% if user|in_group:"Inquilinos" %}
+        · <a href="{% url 'core:inquilino_panel' %}">Mi panel de inquilino</a>
+      {% endif %}
 
-  {# Mensajes flash (opcionales, si usas django.contrib.messages) #}
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+      {% if perms.core.view_inmueble %}
+        · <a href="{% url 'core:inmueble_list' %}">Inmuebles</a>
+      {% endif %}
+      {% if perms.core.view_propietario %}
+        · <a href="{% url 'core:propietario_list' %}">Propietarios</a>
+      {% endif %}
 
-  {% block content %}{% endblock %}
+      {% if user.is_staff %}
+        · <a href="/admin/">Admin</a>
+      {% endif %}
+
+      <span class="right">
+        {% if user.is_authenticated %}
+          {{ user.username }}
+          <form method="post" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'login' %}">
+            <button type="submit" class="btn-link">Salir</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Entrar</a>
+        {% endif %}
+      </span>
+    </nav>
+  </header>
+
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
 
   {% block extra_js %}{% endblock %}
 </body>
