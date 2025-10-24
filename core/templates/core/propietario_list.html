@@ -1,12 +1,42 @@
 {% extends "base.html" %}
-{% block title %}Propietarios · Inmogestor{% endblock %}
+{% block title %}Mis datos de propietario{% endblock %}
 {% block content %}
-<h1>Propietarios</h1>
-<ul>
+<h1>Mis datos de propietario</h1>
+
+{% if object_list %}
   {% for p in object_list %}
-    <li>{{ p.nombre }} ({{ p.dni }}) — {{ p.num_inmuebles }} inmuebles</li>
-  {% empty %}
-    <li>No hay propietarios.</li>
+    <section style="margin-bottom:1.5rem;">
+      <h2 style="margin:0 0 .25rem 0;">{{ p.nombre }} <small style="font-weight:normal;">({{ p.dni }})</small></h2>
+      <p>
+        <strong>Tel.:</strong> {{ p.telefono|default:"—" }} ·
+        <strong>Email:</strong> {{ p.email|default:"—" }} ·
+        <strong>Dirección:</strong> {{ p.direccion|default:"—" }}
+      </p>
+
+      <h3>Inmuebles ({{ p.inmuebles.count }})</h3>
+      <ul>
+        {% for i in p.inmuebles.all %}
+          <li>
+            <a href="{% url 'core:inmueble_detail' i.pk %}">{{ i }}</a>
+            — {{ i.metros }} m²{% if i.habitaciones %}, {{ i.habitaciones }} hab.{% endif %}
+          </li>
+        {% empty %}
+          <li>No hay inmuebles asociados.</li>
+        {% endfor %}
+      </ul>
+
+      <h3>Contratos ({{ p.contratos.count }})</h3>
+      <ul>
+        {% for c in p.contratos.all %}
+          <li>{{ c }}</li>
+        {% empty %}
+          <li>No hay contratos registrados.</li>
+        {% endfor %}
+      </ul>
+    </section>
   {% endfor %}
-</ul>
+{% else %}
+  <p>No hay un Propietario vinculado a tu usuario. Si crees que es un error, contacta con el gestor.</p>
+{% endif %}
+
 {% endblock %}

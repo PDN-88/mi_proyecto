@@ -1,13 +1,20 @@
-from django.shortcuts import render
-def home(request):
-    return render(request, 'home.html')
 # Create your views here.
 # core/views.py
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 from .models import Inmueble, Propietario
 from .forms import InmuebleForm
+
+@login_required
+
+def home(request):
+    return render(request, "home.html")
+
+def user_in_group(user, name: str) -> bool:
+    return user.is_authenticated and user.groups.filter(name__iexact=name).exists()
 
 # --- Inmuebles ---
 class InmuebleList(LoginRequiredMixin, ListView):

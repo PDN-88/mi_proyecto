@@ -10,6 +10,8 @@ class Propietario(models.Model):
     telefono = models.CharField(max_length=20, blank= True)
     email = models.EmailField(max_length=100, blank=True)
     direccion = models.CharField(max_length=100, blank = True)
+    usuario = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="propietarios")
+
     #codigo postal =
 
     def __str__(self):
@@ -44,6 +46,7 @@ class Inquilino(models.Model):
     telefono = models.CharField(max_length=20, blank=True)
     email = models.EmailField(max_length=100, blank=True)
     inmueble = models.ForeignKey(Inmueble, on_delete=models.PROTECT, related_name='inquilinos', null=True,blank=True)
+    usuario = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="inquilinos")
 
     def __str__(self):
         return f"{self.nombre} ({self.dni})"

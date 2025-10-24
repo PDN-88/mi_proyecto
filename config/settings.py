@@ -1,23 +1,15 @@
+# config/settings.py
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
-# 1) Rutas base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 2) Carga variables de .env (solo para desarrollo/compose)
-load_dotenv(BASE_DIR / ".env")
+# --- Básicos ---
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-change-me")
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
+ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",") if h]
 
-# 3) Clave secreta y modo DEBUG
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure")
-DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
-
-# 4) Hosts permitidos (separados por comas en .env)
-ALLOWED_HOSTS = os.getenv(
-    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0"
-).split(",")
-
-# 5) Aplicaciones instaladas (lo básico + admin)
+# --- Apps ---
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -25,11 +17,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Tus apps
+    # apps del proyecto
     "core",
 ]
 
-# 6) Middleware (lo estándar de Django)
+# --- Middleware ---
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -40,15 +32,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# 7) URLs raíz
 ROOT_URLCONF = "config.urls"
 
-# 8) Templates (carga desde /templates y de las apps)
+# --- Templates ---
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # crea esta carpeta si la usas
-        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "templates"],  # <-- tu carpeta /templates
+        "APP_DIRS": True,                  # busca también en app/templates/
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -60,31 +51,21 @@ TEMPLATES = [
     },
 ]
 
-# 9) ASGI/WSGI
 WSGI_APPLICATION = "config.wsgi.application"
-ASGI_APPLICATION = "config.asgi.application"
 
-# 10) Base de datos: Postgres vía .env o fallback a SQLite
-if os.getenv("DATABASE_ENGINE") == "django.db.backends.postgresql":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DATABASE_NAME", "appdb"),
-            "USER": os.getenv("DATABASE_USER", "appuser"),
-            "PASSWORD": os.getenv("DATABASE_PASSWORD", "apppass"),
-            "HOST": os.getenv("DATABASE_HOST", "db"),  # servicio del compose
-            "PORT": os.getenv("DATABASE_PORT", "5432"),
-        }
+# --- Base de datos (Postgres en Docker) ---
+DATABASES = {
+    "default": {
+        "ENGINE": os.environ.get("DATABASE_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.environ.get("DATABASE_NAME", "appdb"),
+        "USER": os.environ.get("DATABASE_USER", "appuser"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD", "apppass"),
+        "HOST": os.environ.get("DATABASE_HOST", "db"),
+        "PORT": os.environ.get("DATABASE_PORT", "5432"),
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "data" / "db.sqlite3",  # BD en archivo
-        }
-    }
+}
 
-# 11) Validación de contraseñas (por defecto)
+# --- Password validators (por defecto) ---
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -92,35 +73,21 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# 12) Idioma y zona horaria
+# --- Localización ---
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
 USE_I18N = True
 USE_TZ = True
 
-# 13) Archivos estáticos y media
+# --- Archivos estáticos ---
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"       # donde se colectan para prod
-STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+STATIC_ROOT = BASE_DIR / "staticfiles"
+# Si tienes estáticos propios en /static, descomenta:
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"              # subidas de usuarios
-
-# 14) Cookies/seguridad básica (mejoras cuando DEBUG=0)
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "DJANGO_CSRF_TRUSTED",
-    "http://localhost,http://127.0.0.1"
-).split(",")
-
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # útil tras Nginx/proxy
-
-# 15) Logging mínimo (ver errores en consola del contenedor)
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "root": {"handlers": ["console"], "level": "INFO"},
-}
-
-# 16) Clave primaria por defecto
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# --- Login / Logout ---
+LOGIN_URL = "login"                        # /accounts/login/
+LOGIN_REDIRECT_URL = "core:dashboard"      # tras login, router de panel
+LOGOUT_REDIRECT_URL = "login"              # tras logout, vuelve al login
