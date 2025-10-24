@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Panel de administración{% endblock %}
+
+{% block content %}
+<h1>Panel del equipo</h1>
+<p>Resumen general de la plataforma. Usa el admin para editar cualquier dato.</p>
+
+<section>
+  <div class="grid">
+    <div class="card"><div class="muted">Propietarios</div><div class="stat">{{ counts.propietarios }}</div></div>
+    <div class="card"><div class="muted">Inquilinos</div><div class="stat">{{ counts.inquilinos }}</div></div>
+    <div class="card"><div class="muted">Inmuebles</div><div class="stat">{{ counts.inmuebles }}</div></div>
+    <div class="card"><div class="muted">Contratos</div><div class="stat">{{ counts.contratos }}</div></div>
+    <div class="card"><div class="muted">Pagos</div><div class="stat">{{ counts.pagos }}</div></div>
+    <div class="card"><div class="muted">Incidencias</div><div class="stat">{{ counts.incidencias }}</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="grid">
+    <div class="card">
+      <h2 style="margin-top:0;">Inmuebles recientes</h2>
+      <ul class="list">
+        {% for i in recent.inmuebles %}
+          <li><strong>{{ i }}</strong><div class="muted">{{ i.propietario }}</div></li>
+        {% empty %}
+          <li class="muted">—</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0;">Pagos recientes</h2>
+      <ul class="list">
+        {% for p in recent.pagos %}
+          <li>
+            <strong>{{ p.fecha|date:"Y-m-d" }}</strong> · {{ p.tipo }} · {{ p.total }} €
+            <div class="muted">{{ p.inmueble }}</div>
+          </li>
+        {% empty %}
+          <li class="muted">—</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0;">Incidencias recientes</h2>
+      <ul class="list">
+        {% for inc in recent.incidencias %}
+          <li>
+            <strong>{{ inc.inmueble }}</strong>
+            <div class="muted">{{ inc.fecha_reporte|date:"Y-m-d" }} · {{ inc.estado }}</div>
+          </li>
+        {% empty %}
+          <li class="muted">—</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<p>
+  <a class="btn" href="/admin/">Ir al admin</a>
+  · <a class="btn" href="{% url 'core:inmueble_list' %}">Gestionar inmuebles</a>
+  · <a class="btn" href="{% url 'core:propietario_list' %}">Propietarios</a>
+</p>
+{% endblock %}

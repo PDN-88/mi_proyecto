@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Panel de inquilino{% endblock %}
+{% block title %}Panel de propietario{% endblock %}
 
 {% block content %}
-<h1>Panel de inquilino</h1>
-<p>Aquí puedes ver el estado de tus viviendas, contratos y pagos.</p>
+<h1>Panel de propietario</h1>
+<p>Bienvenido. Aquí puedes revisar el estado de tus inmuebles, pagos e incidencias.</p>
 
 <section>
   <div class="grid">
     <div class="card">
-      <div class="muted">Viviendas</div>
+      <div class="muted">Inmuebles</div>
       <div class="stat">{{ stats.inmuebles }}</div>
     </div>
     <div class="card">
@@ -27,16 +27,19 @@
 </section>
 
 <section>
-  <h2>Mis viviendas</h2>
+  <h2>Mis inmuebles</h2>
   <div class="grid">
     {% for i in inmuebles %}
       <div class="card">
         <h3 style="margin:0 0 .25rem 0;">{{ i }}</h3>
         <div class="muted">{{ i.metros }} m²{% if i.habitaciones %} · {{ i.habitaciones }} hab.{% endif %}</div>
-        <a class="btn" href="{% url 'core:inmueble_detail' i.pk %}">Ver</a>
+        <div style="margin-top:.5rem;">
+          <a class="btn" href="{% url 'core:inmueble_detail' i.pk %}">Ver</a>
+          <a class="btn" href="{% url 'core:inmueble_update' i.pk %}">Editar</a>
+        </div>
       </div>
     {% empty %}
-      <p>No tienes viviendas asociadas.</p>
+      <p>No tienes inmuebles asociados actualmente.</p>
     {% endfor %}
   </div>
 </section>
@@ -50,7 +53,7 @@
           <li>
             <strong>{{ p.fecha|date:"Y-m-d" }}</strong> · {{ p.tipo }} · {{ p.total }} € ·
             <span class="badge {% if p.pagado %}ok{% else %}warn{% endif %}">{% if p.pagado %}Pagado{% else %}Pendiente{% endif %}</span>
-            <div class="muted">{{ p.inmueble }}{% if p.quien_paga %} · paga: {{ p.get_quien_paga_display }}{% endif %}</div>
+            <div class="muted">{{ p.inmueble }}</div>
           </li>
         {% empty %}
           <li class="muted">No hay pagos registrados.</li>
@@ -83,7 +86,7 @@
         <div class="muted">Inquilinos: {% for i in c.inquilinos.all %}{{ i.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
       </li>
     {% empty %}
-      <li class="muted">No hay contratos.</li>
+      <li class="muted">No hay contratos registrados.</li>
     {% endfor %}
   </ul>
 </section>

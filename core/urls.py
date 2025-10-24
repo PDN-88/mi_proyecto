@@ -5,6 +5,13 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.home, name="home"),
+
+    # Paneles de usuario
+    path("panel/", views.dashboard, name="dashboard"),
+    path("panel/propietario/", views.propietario_panel, name="propietario_panel"),
+    path("panel/inquilino/", views.inquilino_panel, name="inquilino_panel"),
+    path("panel/staff/", views.staff_panel, name="staff_panel"),
+
     # Inmuebles (CRUD básico)
     path("inmuebles/", views.InmuebleList.as_view(), name="inmueble_list"),
     path("inmuebles/<int:pk>/", views.InmuebleDetail.as_view(), name="inmueble_detail"),
